@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login - Book Store{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Login</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'users:password_reset' %}" class="text-decoration-none">Forgot your password?</a>
+                        </div>
+                    </form>
+                    <hr>
+                    <p class="text-center mb-0">
+                        Don't have an account? <a href="{% url 'users:register' %}" class="text-decoration-none">Register</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

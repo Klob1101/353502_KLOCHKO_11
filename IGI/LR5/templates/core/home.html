@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">Welcome to Book Store</h1>
+            
+            {% if latest_article %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Latest News</h5>
+                </div>
+                <div class="card-body">
+                    {% if latest_article.image %}
+                    <img src="{{ latest_article.image.url }}" class="img-fluid rounded mb-3" alt="{{ latest_article.title }}">
+                    {% endif %}
+                    <h2 class="h4">{{ latest_article.title }}</h2>
+                    <p class="text-muted">
+                        <small>
+                            Published {{ latest_article.created_at|date:"F j, Y" }}
+                            by {{ latest_article.author.get_full_name|default:latest_article.author.username }}
+                        </small>
+                    </p>
+                    <p>{{ latest_article.summary }}</p>
+                    <a href="{% url 'core:article_detail' latest_article.pk %}" class="btn btn-primary">Read More</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="h5">Browse Books</h3>
+                            <p>Discover our wide selection of books across various genres.</p>
+                            <a href="{% url 'books:book_list' %}" class="btn btn-outline-primary">View Books</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h3 class="h5">Current Promotions</h3>
+                            <p>Check out our latest deals and special offers.</p>
+                            <a href="{% url 'core:promotion_list' %}" class="btn btn-outline-primary">View Promotions</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Links</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:about' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-building"></i> About Us
+                    </a>
+                    <a href="{% url 'core:contacts' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-lines-fill"></i> Contact Us
+                    </a>
+                    <a href="{% url 'core:faq_list' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-question-circle"></i> FAQ
+                    </a>
+                    <a href="{% url 'core:vacancy_list' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-briefcase"></i> Careers
+                    </a>
+                </div>
+            </div>
+
+            {% if user.is_authenticated %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">My Account</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'books:cart_detail' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-cart"></i> Shopping Cart
+                    </a>
+                    <a href="{% url 'books:order_list' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-box"></i> My Orders
+                    </a>
+                    <a href="{% url 'users:profile' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person"></i> Profile Settings
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

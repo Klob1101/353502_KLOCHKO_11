@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Vacancies{% endblock %}
+{% block content %}
+<h2>Vacancies</h2>
+{% if user.is_staff %}
+<a href="{% url 'books:vacancy_create' %}" class="btn btn-success mb-3">Add Vacancy</a>
+{% endif %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Salary</th>
+            <th>Created</th>
+            {% if user.is_staff %}<th>Actions</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for vacancy in vacancies %}
+        <tr>
+            <td>{{ vacancy.title }}</td>
+            <td>{{ vacancy.description|truncatewords:15 }}</td>
+            <td>{{ vacancy.salary }}</td>
+            <td>{{ vacancy.created_at|date:'d/m/Y' }}</td>
+            {% if user.is_staff %}
+            <td>
+                <a href="{% url 'books:vacancy_update' vacancy.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                <a href="{% url 'books:vacancy_delete' vacancy.pk %}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+            {% endif %}
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No vacancies found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %} 

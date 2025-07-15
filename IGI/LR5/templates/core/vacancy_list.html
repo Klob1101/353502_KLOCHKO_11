@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Career Opportunities - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Career Opportunities</h1>
+
+    {% if vacancies %}
+    <div class="row">
+        <div class="col-md-8">
+            {% regroup vacancies by department as department_list %}
+            
+            {% for department in department_list %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="h5 mb-0">{{ department.grouper }}</h3>
+                </div>
+                <div class="card-body">
+                    {% for vacancy in department.list %}
+                    <div class="vacancy-item {% if not forloop.last %}border-bottom pb-4 mb-4{% endif %}">
+                        <h4>{{ vacancy.title }}</h4>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge bg-primary me-2">{{ vacancy.department }}</span>
+                                {% if vacancy.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% endif %}
+                            </div>
+                            <div class="text-muted">
+                                <i class="bi bi-currency-dollar"></i>
+                                {{ vacancy.salary_min }} - {{ vacancy.salary_max }} per year
+                            </div>
+                        </div>
+                        
+                        <h5 class="h6">Requirements:</h5>
+                        <div class="mb-3">
+                            {{ vacancy.requirements|linebreaks }}
+                        </div>
+
+                        <h5 class="h6">Description:</h5>
+                        <div class="mb-3">
+                            {{ vacancy.description|linebreaks }}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Posted: {{ vacancy.created_at|date:"F j, Y" }}
+                            </small>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#applyModal{{ vacancy.id }}">
+                                Apply Now
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="applyModal{{ vacancy.id }}" tabindex="-1" aria-labelledby="applyModalLabel{{ vacancy.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="applyModalLabel{{ vacancy.id }}">Apply for {{ vacancy.title }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>To apply for this position, please send your CV and cover letter to:</p>
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-envelope"></i> careers@bookstore.com
+                                    </div>
+                                    <p>Please include the following in the subject line:</p>
+                                    <div class="alert alert-secondary">
+                                        Application: {{ vacancy.title }} ({{ vacancy.department }})
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <a href="mailto:careers@bookstore.com?subject=Application: {{ vacancy.title }} ({{ vacancy.department }})" 
+                                       class="btn btn-primary">
+                                        Open Email Client
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Why Join Us?</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            Competitive salary and benefits
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            Professional development opportunities
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            Flexible working hours
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            Employee discount on books
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            Friendly team environment
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Links</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'core:about' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-building"></i> About Us
+                    </a>
+                    <a href="{% url 'core:contacts' %}" class="list-group-item list-group-item-action">
+                        <i class="bi bi-person-lines-fill"></i> Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <h4 class="alert-heading">No Open Positions</h4>
+        <p>We currently don't have any open positions. Please check back later or send your CV to careers@bookstore.com for future opportunities.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

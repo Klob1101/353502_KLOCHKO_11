@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock %}
+{% block content %}
+<h2>About the Company</h2>
+{% if info %}
+    <h4>{{ info.name }}</h4>
+    <p>{{ info.description }}</p>
+    {% if info.founded_year %}<p><strong>Founded:</strong> {{ info.founded_year }}</p>{% endif %}
+    {% if info.requisites %}<p><strong>Requisites:</strong> {{ info.requisites }}</p>{% endif %}
+    <p><small>Last updated: {{ info.updated_at|date:'d/m/Y' }}</small></p>
+{% else %}
+    <p>No company info available.</p>
+{% endif %}
+{% endblock %} 

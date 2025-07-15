@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Book Store{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.33/moment-timezone.min.js"></script>
+    {% csrf_token %}
+    {% block extra_css %}{% endblock %}
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        main {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        .logout-form {
+            display: inline;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,.55);
+            padding: 8px;
+            cursor: pointer;
+        }
+        .logout-btn:hover {
+            color: rgba(255,255,255,.75);
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Detect user's timezone
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // Store timezone in localStorage
+            localStorage.setItem('userTimezone', timezone);
+            // Send timezone to server on every page load
+            fetch('/set-timezone/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ timezone: timezone })
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'books:home' %}">Book Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'book_list' %}active{% endif %}" 
+                           href="{% url 'books:book_list' %}">Books</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'cart_detail' %}active{% endif %}" 
+                           href="{% url 'books:cart_detail' %}">
+                            Cart <span class="badge bg-primary">{{ cart_count }}</span>
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    {% endif %}
+                    {% if user.is_staff %}
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'vacancy_list' %}active{% endif %}" 
+                           href="{% url 'books:vacancy_list' %}">Vacancies</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'company_info' %}active{% endif %}" href="{% url 'books:company_info' %}">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'news_list' %}active{% endif %}" href="{% url 'books:news_list' %}">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'terms_list' %}active{% endif %}" href="{% url 'books:terms_list' %}">Glossary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contacts' %}active{% endif %}" href="{% url 'books:contacts' %}">Contacts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'privacy_policy' %}active{% endif %}" href="{% url 'books:privacy_policy' %}">Privacy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'promocode_list' %}active{% endif %}" href="{% url 'books:promocode_list' %}">Promo Codes</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ user.get_full_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'users:profile' %}">Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'books:order_list' %}">My Orders</a></li>
+                                {% if user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'books:statistics' %}">Statistics</a></li>
+                                <li><a class="dropdown-item" href="{% url 'books:moderate_reviews' %}">Moderate Reviews</a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'users:logout' %}" class="logout-form">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'users:register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer mt-auto py-3 bg-dark text-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'books:book_list' %}" class="text-light">Books</a></li>
+                        <li><a href="{% url 'books:cart_detail' %}" class="text-light">Cart</a></li>
+                        {% if user.is_authenticated %}
+                        {% endif %}
+                        <li><a href="{% url 'books:vacancy_list' %}" class="text-light">Vacancies</a></li>
+                        <li><a href="{% url 'books:company_info' %}" class="text-light">About</a></li>
+                        <li><a href="{% url 'books:news_list' %}" class="text-light">News</a></li>
+                        <li><a href="{% url 'books:terms_list' %}" class="text-light">Glossary</a></li>
+                        <li><a href="{% url 'books:contacts' %}" class="text-light">Contacts</a></li>
+                        <li><a href="{% url 'books:privacy_policy' %}" class="text-light">Privacy</a></li>
+                        <li><a href="{% url 'books:promocode_list' %}" class="text-light">Promo Codes</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Follow Us</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-light me-2"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-light me-2"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-light me-2"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-light">
+            <div class="text-center">
+                <small>&copy; {% now "Y" %} Book Store. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

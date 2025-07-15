@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sales Analytics{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Sales Analytics</h1>
+
+    <!-- Statistics List -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Sales Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Total Sales</th>
+                                    <th>Total Orders</th>
+                                    <th>Average Order Value</th>
+                                    <th>Best Selling Book</th>
+                                    <th>Best Selling Genre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in statistics %}
+                                <tr>
+                                    <td>{{ stat.date|date:"F j, Y" }}</td>
+                                    <td>${{ stat.total_sales|floatformat:2 }}</td>
+                                    <td>{{ stat.total_orders }}</td>
+                                    <td>${{ stat.average_order_value|floatformat:2 }}</td>
+                                    <td>
+                                        {% if stat.best_selling_book %}
+                                        {{ stat.best_selling_book.title }}
+                                        {% else %}
+                                        N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if stat.best_selling_genre %}
+                                        {{ stat.best_selling_genre.name }}
+                                        {% else %}
+                                        N/A
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No sales statistics available</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

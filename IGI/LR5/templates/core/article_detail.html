@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ article.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:article_list' %}">News</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ article.title }}</li>
+        </ol>
+    </nav>
+
+    <article class="blog-post">
+        <h1 class="mb-3">{{ article.title }}</h1>
+        
+        <p class="blog-post-meta text-muted mb-4">
+            Published on {{ article.created_at|date:"F j, Y" }} by 
+            {{ article.author.get_full_name|default:article.author.username }}
+            {% if article.updated_at > article.created_at %}
+            <br>
+            <small>Last updated: {{ article.updated_at|date:"F j, Y, P" }}</small>
+            {% endif %}
+        </p>
+
+        {% if article.image %}
+        <figure class="figure mb-4">
+            <img src="{{ article.image.url }}" class="figure-img img-fluid rounded" alt="{{ article.title }}">
+        </figure>
+        {% endif %}
+
+        <div class="blog-post-content">
+            {{ article.content|linebreaks }}
+        </div>
+    </article>
+
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <a href="{% url 'core:article_list' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Back to News
+            </a>
+        </div>
+        <div class="col-md-6 text-end">
+            <div class="share-buttons">
+                <span class="me-2">Share:</span>
+                <a href="https://twitter.com/intent/tweet?text={{ article.title|urlencode }}&url={{ request.build_absolute_uri }}" 
+                   target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-twitter"></i>
+                </a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                   target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-facebook"></i>
+                </a>
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ article.title|urlencode }}" 
+                   target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-linkedin"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - Book Store{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Shopping Cart</h2>
+                </div>
+                <div class="card-body">
+                    {% if cart_items %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart_items %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if item.book.cover %}
+                                                <img src="{{ item.book.cover.url }}" alt="{{ item.book.title }}" class="img-thumbnail me-3" style="width: 50px;">
+                                                {% else %}
+                                                <div class="bg-secondary text-white d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                                    <i class="bi bi-book"></i>
+                                                </div>
+                                                {% endif %}
+                                                <div>
+                                                    <a href="{% url 'books:book_detail' item.book.id %}" class="text-decoration-none">{{ item.book.title }}</a>
+                                                    <br>
+                                                    <small class="text-muted">
+                                                        {% for author in item.book.authors.all %}
+                                                        {{ author.name }}{% if not forloop.last %}, {% endif %}
+                                                        {% endfor %}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>${{ item.book.price }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>${{ item.total }}</td>
+                                        <td>
+                                            <a href="{% url 'books:cart_remove' item.book.id %}" class="btn btn-sm btn-danger">Remove</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center">Your cart is empty.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Order Summary</h3>
+                </div>
+                <div class="card-body">
+                    <p class="d-flex justify-content-between">
+                        <span>Total:</span>
+                        <strong>${{ total }}</strong>
+                    </p>
+                    <hr>
+                    {% if cart_items %}
+                        <a href="{% url 'books:order_create' %}" class="btn btn-success w-100">Proceed to Checkout</a>
+                    {% else %}
+                        <a href="{% url 'books:book_list' %}" class="btn btn-primary w-100">Continue Shopping</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
