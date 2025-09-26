@@ -9,6 +9,7 @@ urlpatterns = [
     path('', include('books.urls')),
     path('users/', include('users.urls', namespace='users')),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('api/', include('books.api_urls')),
     path('set-timezone/', set_timezone, name='set-timezone'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

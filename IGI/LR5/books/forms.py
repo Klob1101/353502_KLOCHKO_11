@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import MinValueValidator
-from .models import Customer, Book, Review, Order, PickupPoint, Vacancy
+from .models import Customer, Book, Review, Order, PickupPoint, Vacancy, CustomerReview
 from django.utils import timezone
 
 class CustomerForm(forms.ModelForm):
@@ -56,4 +56,14 @@ class OrderForm(forms.ModelForm):
 class VacancyForm(forms.ModelForm):
     class Meta:
         model = Vacancy
-        fields = ['title', 'description', 'requirements', 'salary', 'is_active'] 
+        fields = ['title', 'description', 'requirements', 'salary', 'is_active']
+
+class CustomerReviewForm(forms.ModelForm):
+    class Meta:
+        model = CustomerReview
+        fields = ['rating', 'title', 'text']
+        widgets = {
+            'rating': forms.Select(choices=[(i, f"{i} Star{'s' if i != 1 else ''}") for i in range(1, 6)]),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Review title (optional)'}),
+            'text': forms.Textarea(attrs={'rows': 4, 'class': 'form-control', 'placeholder': 'Share your experience...'}),
+        } 

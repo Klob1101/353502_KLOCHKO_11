@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Author, Genre, Publisher, Book, Customer, Order, OrderItem, Review, SalesStatistics, UserSession, PickupPoint, PromoCode, Vacancy, CompanyInfo, Article, Term, Employee
+from .models import (
+    Author, Genre, Publisher, Book, Customer, Order, OrderItem, Review, 
+    SalesStatistics, UserSession, PickupPoint, PromoCode, Vacancy, 
+    CompanyInfo, Article, Term, Employee, Banner, Partner, CompanyHistory, 
+    CustomerReview, FAQ, Cart, CartItem
+)
 
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
@@ -117,3 +122,61 @@ class TermAdmin(admin.ModelAdmin):
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ['name', 'position', 'phone', 'email']
     search_fields = ['name', 'position', 'phone', 'email']
+
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_active', 'order']
+    list_filter = ['is_active']
+    search_fields = ['title', 'description']
+    list_editable = ['is_active', 'order']
+
+@admin.register(Partner)
+class PartnerAdmin(admin.ModelAdmin):
+    list_display = ['name', 'website', 'is_active', 'created_at']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['name', 'description']
+    list_editable = ['is_active']
+
+@admin.register(CompanyHistory)
+class CompanyHistoryAdmin(admin.ModelAdmin):
+    list_display = ['year', 'title']
+    search_fields = ['title', 'description']
+    ordering = ['-year']
+
+@admin.register(CustomerReview)
+class CustomerReviewAdmin(admin.ModelAdmin):
+    list_display = ['customer', 'rating', 'title', 'is_approved', 'created_at']
+    list_filter = ['rating', 'is_approved', 'created_at']
+    search_fields = ['customer__user__username', 'title', 'text']
+    actions = ['approve_reviews']
+
+    def approve_reviews(self, request, queryset):
+        updated = queryset.update(is_approved=True)
+        self.message_user(request, f"{updated} review(s) approved.")
+    approve_reviews.short_description = "Approve selected reviews"
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ['question', 'category', 'is_published', 'created_at']
+    list_filter = ['category', 'is_published', 'created_at']
+    search_fields = ['question', 'answer']
+    list_editable = ['category', 'is_published']
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['user', 'created_at', 'updated_at']
+    search_fields = ['user__username']
+    readonly_fields = ['created_at', 'updated_at']
+    inlines = [
+        type('CartItemInline', (admin.TabularInline,), {
+            'model': CartItem,
+            'extra': 0,
+            'raw_id_fields': ['book'],
+        })
+    ]
+
+@admin.register(CartItem)
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ['cart', 'book', 'quantity', 'created_at']
+    search_fields = ['cart__user__username', 'book__title']
+    raw_id_fields = ['cart', 'book']

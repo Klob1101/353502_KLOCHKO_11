@@ -29,4 +29,5 @@ urlpatterns = [
     path('promocodes/', views.promocode_list, name='promocode_list'),
     path('review/<int:pk>/edit/', views.edit_review, name='edit_review'),
     path('review/<int:pk>/delete/', views.delete_review, name='delete_review'),
+    path('html5-showcase/', views.html5_showcase, name='html5_showcase'),
 ] 

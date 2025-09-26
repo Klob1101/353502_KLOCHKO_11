@@ -527,3 +527,8 @@ def delete_review(request, pk):
         messages.success(request, 'Ваш отзыв удалён.')
         return redirect('books:book_detail', pk=book_pk)
     return render(request, 'books/delete_review_confirm.html', {'review': review})
+
+
+def html5_showcase(request):
+    """HTML5 Features Showcase page."""
+    return render(request, 'books/html5_showcase.html', {})

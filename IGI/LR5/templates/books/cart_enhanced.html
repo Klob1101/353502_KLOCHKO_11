@@ -1,0 +1,954 @@
+{% extends 'base_enhanced.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - HeavyShop{% endblock %}
+
+{% block meta_description %}
+Review your selected books, update quantities, and proceed to checkout. Secure shopping cart with instant updates and multiple payment options.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Shopping Cart",
+    "description": "Review and manage your book selections before checkout"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav aria-label="Breadcrumb">
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'books:home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- Main Cart Content -->
+    <main class="col-lg-8">
+        <section aria-labelledby="cart-heading">
+            <header class="d-flex justify-content-between align-items-center mb-4">
+                <h1 id="cart-heading" class="display-6 mb-0">
+                    <i class="bi bi-cart3 text-primary"></i>
+                    Shopping Cart
+                    {% if cart.items.count > 0 %}
+                        <span class="badge bg-secondary ms-2">{{ cart.items.count }} item{{ cart.items.count|pluralize }}</span>
+                    {% endif %}
+                </h1>
+                
+                {% if cart.items.count > 0 %}
+                    <button type="button" 
+                            class="btn btn-outline-danger btn-sm"
+                            onclick="clearCart()"
+                            title="Clear all items from cart">
+                        <i class="bi bi-trash me-1"></i>Clear Cart
+                    </button>
+                {% endif %}
+            </header>
+            
+            {% if cart.items.count > 0 %}
+                <!-- Cart Items Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" 
+                           summary="Shopping cart items with product details, quantities, and prices">
+                        <caption class="visually-hidden">
+                            Items in your shopping cart with options to modify quantities or remove items
+                        </caption>
+                        
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" id="product-col">Product</th>
+                                <th scope="col" id="price-col" class="text-center">Unit Price</th>
+                                <th scope="col" id="quantity-col" class="text-center">Quantity</th>
+                                <th scope="col" id="total-col" class="text-center">Total</th>
+                                <th scope="col" id="actions-col" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody>
+                            {% for item in cart.items.all %}
+                                <tr class="cart-item" data-item-id="{{ item.id }}" itemscope itemtype="http://schema.org/Product">
+                                    <!-- Product Information -->
+                                    <td headers="product-col" class="product-info">
+                                        <div class="d-flex align-items-center">
+                                            <div class="product-image me-3">
+                                                {% if item.book.cover %}
+                                                    <img src="{{ item.book.cover.url }}" 
+                                                         alt="Cover of {{ item.book.title }}"
+                                                         class="img-thumbnail"
+                                                         style="width: 80px; height: 100px; object-fit: cover;"
+                                                         itemprop="image">
+                                                {% else %}
+                                                    <div class="bg-light border rounded d-flex align-items-center justify-content-center"
+                                                         style="width: 80px; height: 100px;">
+                                                        <i class="bi bi-book text-muted"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="product-details flex-grow-1">
+                                                <h2 class="h6 mb-1" itemprop="name">
+                                                    <a href="{{ item.book.get_absolute_url }}" 
+                                                       class="text-decoration-none">
+                                                        {{ item.book.title }}
+                                                    </a>
+                                                </h2>
+                                                
+                                                <p class="text-muted small mb-1">
+                                                    by {% for author in item.book.authors.all %}
+                                                        {{ author.name }}{% if not forloop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                </p>
+                                                
+                                                {% if item.book.isbn %}
+                                                    <p class="text-muted small mb-1">
+                                                        ISBN: <code>{{ item.book.isbn }}</code>
+                                                    </p>
+                                                {% endif %}
+                                                
+                                                <!-- Availability Status -->
+                                                {% if not item.book.is_available %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                                        Out of Stock
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    
+                                    <!-- Unit Price -->
+                                    <td headers="price-col" class="text-center price-cell">
+                                        <span class="unit-price" 
+                                              data-price="{{ item.book.price }}" 
+                                              itemprop="offers" 
+                                              itemscope 
+                                              itemtype="http://schema.org/Offer">
+                                            <span itemprop="price" content="{{ item.book.price }}">{{ item.book.price }}</span>
+                                            <span class="currency" itemprop="priceCurrency" content="BYN">BYN</span>
+                                        </span>
+                                    </td>
+                                    
+                                    <!-- Quantity Controls -->
+                                    <td headers="quantity-col" class="text-center quantity-cell">
+                                        <div class="input-group input-group-sm quantity-controls" 
+                                             style="max-width: 120px; margin: 0 auto;">
+                                            <button type="button" 
+                                                    class="btn btn-outline-secondary quantity-btn"
+                                                    data-action="decrease"
+                                                    data-item-id="{{ item.id }}"
+                                                    {% if item.quantity <= 1 %}disabled{% endif %}
+                                                    aria-label="Decrease quantity">
+                                                <i class="bi bi-dash"></i>
+                                            </button>
+                                            
+                                            <input type="number" 
+                                                   class="form-control text-center quantity-input"
+                                                   value="{{ item.quantity }}"
+                                                   min="1"
+                                                   max="99"
+                                                   data-item-id="{{ item.id }}"
+                                                   aria-label="Quantity for {{ item.book.title }}">
+                                            
+                                            <button type="button" 
+                                                    class="btn btn-outline-secondary quantity-btn"
+                                                    data-action="increase"
+                                                    data-item-id="{{ item.id }}"
+                                                    {% if item.quantity >= 99 %}disabled{% endif %}
+                                                    aria-label="Increase quantity">
+                                                <i class="bi bi-plus"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Stock info -->
+                                        {% if item.book.stock_quantity %}
+                                            <small class="text-muted d-block mt-1">
+                                                {{ item.book.stock_quantity }} in stock
+                                            </small>
+                                        {% endif %}
+                                    </td>
+                                    
+                                    <!-- Item Total -->
+                                    <td headers="total-col" class="text-center total-cell">
+                                        <strong class="item-total" data-item-id="{{ item.id }}">
+                                            {{ item.total_price }} BYN
+                                        </strong>
+                                    </td>
+                                    
+                                    <!-- Actions -->
+                                    <td headers="actions-col" class="text-center actions-cell">
+                                        <div class="btn-group-vertical" role="group">
+                                            <!-- Save for Later -->
+                                            <button type="button" 
+                                                    class="btn btn-outline-secondary btn-sm mb-1"
+                                                    onclick="saveForLater({{ item.id }})"
+                                                    title="Save for later">
+                                                <i class="bi bi-heart"></i>
+                                            </button>
+                                            
+                                            <!-- Remove Item -->
+                                            <button type="button" 
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    onclick="removeItem({{ item.id }})"
+                                                    title="Remove from cart">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end fw-bold">Subtotal:</td>
+                                <td class="text-center fw-bold" id="cart-subtotal">
+                                    {{ cart.total_amount }} BYN
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <!-- Promocode Section -->
+                <section class="promocode-section mt-4" aria-labelledby="promo-heading">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 id="promo-heading" class="h6 mb-0">
+                                <i class="bi bi-tag text-success"></i>
+                                Promotional Code
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <form class="promocode-form" onsubmit="applyPromocode(event)">
+                                <div class="input-group">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           name="promocode"
+                                           placeholder="Enter promocode..."
+                                           pattern="[A-Za-z0-9\-_]+"
+                                           maxlength="20"
+                                           aria-label="Promocode">
+                                    <button type="submit" 
+                                            class="btn btn-success">
+                                        <i class="bi bi-check2 me-1"></i>Apply
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Have a discount code? Enter it here to save on your order.
+                                </div>
+                            </form>
+                            
+                            <!-- Applied promocode display -->
+                            <div id="applied-promocode" class="mt-3" style="display: none;">
+                                <div class="alert alert-success d-flex justify-content-between align-items-center">
+                                    <span>
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        Promocode "<strong id="promocode-name"></strong>" applied!
+                                        Discount: <strong id="promocode-discount"></strong>
+                                    </span>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-success"
+                                            onclick="removePromocode()">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Continue Shopping -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{% url 'books:book_list' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                    </a>
+                    
+                    <button type="button" 
+                            class="btn btn-warning"
+                            onclick="updateAllQuantities()"
+                            title="Update all quantities">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Update Cart
+                    </button>
+                </div>
+                
+            {% else %}
+                <!-- Empty Cart -->
+                <div class="empty-cart text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <h2 class="h4 mb-3">Your cart is empty</h2>
+                    
+                    <p class="text-muted mb-4">
+                        Looks like you haven't added any books to your cart yet. 
+                        Start exploring our collection to find your next great read!
+                    </p>
+                    
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        <a href="{% url 'books:book_list' %}" class="btn btn-primary">
+                            <i class="bi bi-book me-2"></i>Browse Books
+                        </a>
+                        
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'books:wishlist' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-heart me-2"></i>View Wishlist
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+    
+    <!-- Cart Summary Sidebar -->
+    <aside class="col-lg-4">
+        {% if cart.items.count > 0 %}
+            <!-- Order Summary -->
+            <section class="order-summary mb-4" aria-labelledby="summary-heading">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 id="summary-heading" class="h5 mb-0">
+                            <i class="bi bi-receipt me-2"></i>
+                            Order Summary
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-7">Subtotal:</dt>
+                            <dd class="col-5 text-end" id="summary-subtotal">
+                                {{ cart.total_amount }} BYN
+                            </dd>
+                            
+                            <dt class="col-7">Discount:</dt>
+                            <dd class="col-5 text-end text-success" id="summary-discount">
+                                -0.00 BYN
+                            </dd>
+                            
+                            <dt class="col-7">Shipping:</dt>
+                            <dd class="col-5 text-end" id="summary-shipping">
+                                <span class="text-success">FREE</span>
+                            </dd>
+                            
+                            <dt class="col-7">Tax (VAT 20%):</dt>
+                            <dd class="col-5 text-end" id="summary-tax">
+                                {{ cart.tax_amount|default:"0.00" }} BYN
+                            </dd>
+                        </dl>
+                        
+                        <hr>
+                        
+                        <dl class="row">
+                            <dt class="col-7 h5">Total:</dt>
+                            <dd class="col-5 text-end h5 text-primary" id="summary-total">
+                                {{ cart.final_amount }} BYN
+                            </dd>
+                        </dl>
+                        
+                        <!-- Estimated Delivery -->
+                        <div class="delivery-info mt-3 p-3 bg-light rounded">
+                            <h3 class="h6 mb-2">
+                                <i class="bi bi-truck text-info"></i>
+                                Estimated Delivery
+                            </h3>
+                            <p class="small mb-1">
+                                <strong>Standard delivery:</strong> 
+                                <time datetime="{{ estimated_delivery|date:'c' }}">
+                                    {{ estimated_delivery|date:"M j, Y" }}
+                                </time>
+                            </p>
+                            <p class="small mb-0 text-muted">
+                                Free shipping on orders over 50 BYN
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <div class="d-grid">
+                            <a href="{% url 'books:checkout' %}" 
+                               class="btn btn-success btn-lg"
+                               {% if not user.is_authenticated %}
+                                   onclick="return confirm('Please log in to proceed with checkout.')"
+                               {% endif %}>
+                                <i class="bi bi-credit-card me-2"></i>
+                                Proceed to Checkout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Security & Trust Indicators -->
+            <section class="security-info mb-4" aria-labelledby="security-heading">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2 id="security-heading" class="h6 mb-0">
+                            <i class="bi bi-shield-check me-2"></i>
+                            Secure Shopping
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="security-features">
+                            <div class="feature mb-2">
+                                <i class="bi bi-lock text-success me-2"></i>
+                                <small>SSL encrypted checkout</small>
+                            </div>
+                            <div class="feature mb-2">
+                                <i class="bi bi-credit-card text-success me-2"></i>
+                                <small>Secure payment processing</small>
+                            </div>
+                            <div class="feature mb-2">
+                                <i class="bi bi-arrow-repeat text-success me-2"></i>
+                                <small>Easy returns within 14 days</small>
+                            </div>
+                            <div class="feature">
+                                <i class="bi bi-headset text-success me-2"></i>
+                                <small>24/7 customer support</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Recommended Books -->
+            {% if recommended_books %}
+                <section class="recommended-books" aria-labelledby="recommended-heading">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h2 id="recommended-heading" class="h6 mb-0">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                You might also like
+                            </h2>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                {% for book in recommended_books|slice:":3" %}
+                                    <div class="list-group-item">
+                                        <div class="d-flex align-items-center">
+                                            {% if book.cover %}
+                                                <img src="{{ book.cover.url }}" 
+                                                     alt="{{ book.title }}"
+                                                     class="me-3 rounded"
+                                                     style="width: 40px; height: 50px; object-fit: cover;">
+                                            {% endif %}
+                                            
+                                            <div class="flex-grow-1">
+                                                <h3 class="h6 mb-1">
+                                                    <a href="{{ book.get_absolute_url }}" 
+                                                       class="text-decoration-none">
+                                                        {{ book.title|truncatechars:30 }}
+                                                    </a>
+                                                </h3>
+                                                <p class="text-muted small mb-1">{{ book.price }} BYN</p>
+                                            </div>
+                                            
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-primary quick-add-btn"
+                                                    data-book-id="{{ book.id }}"
+                                                    title="Quick add to cart">
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            {% endif %}
+        {% endif %}
+        
+        <!-- Save Cart Progress -->
+        {% if cart.items.count > 0 and user.is_authenticated %}
+            <section class="cart-actions mt-4" aria-labelledby="actions-heading">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 id="actions-heading" class="h6 mb-0">
+                            <i class="bi bi-bookmark me-2"></i>
+                            Cart Actions
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="button" 
+                                    class="btn btn-outline-info btn-sm"
+                                    onclick="saveCart()">
+                                <i class="bi bi-cloud-arrow-up me-1"></i>
+                                Save Cart
+                            </button>
+                            
+                            <button type="button" 
+                                    class="btn btn-outline-secondary btn-sm"
+                                    onclick="shareCart()">
+                                <i class="bi bi-share me-1"></i>
+                                Share Cart
+                            </button>
+                            
+                            <button type="button" 
+                                    class="btn btn-outline-warning btn-sm"
+                                    onclick="printCart()">
+                                <i class="bi bi-printer me-1"></i>
+                                Print Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+    </aside>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50" 
+     style="z-index: 9999;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quantity control buttons
+    const quantityButtons = document.querySelectorAll('.quantity-btn');
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+    
+    quantityButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const action = this.dataset.action;
+            const itemId = this.dataset.itemId;
+            const input = document.querySelector(`input[data-item-id="${itemId}"]`);
+            
+            let newQuantity = parseInt(input.value);
+            
+            if (action === 'increase' && newQuantity < 99) {
+                newQuantity++;
+            } else if (action === 'decrease' && newQuantity > 1) {
+                newQuantity--;
+            }
+            
+            input.value = newQuantity;
+            updateQuantity(itemId, newQuantity);
+        });
+    });
+    
+    // Quantity input direct changes
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const itemId = this.dataset.itemId;
+            let quantity = parseInt(this.value);
+            
+            if (quantity < 1) quantity = 1;
+            if (quantity > 99) quantity = 99;
+            
+            this.value = quantity;
+            updateQuantity(itemId, quantity);
+        });
+    });
+    
+    // Quick add buttons for recommendations
+    const quickAddButtons = document.querySelectorAll('.quick-add-btn');
+    quickAddButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const bookId = this.dataset.bookId;
+            const originalContent = this.innerHTML;
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            
+            fetch('/api/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    'book_id': bookId,
+                    'quantity': 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.innerHTML = '<i class="bi bi-check"></i>';
+                    this.classList.replace('btn-outline-primary', 'btn-success');
+                    
+                    // Refresh page after 1 second
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    throw new Error(data.message || 'Failed to add item');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.innerHTML = originalContent;
+                this.disabled = false;
+                alert('Failed to add item to cart');
+            });
+        });
+    });
+});
+
+// Update item quantity
+function updateQuantity(itemId, quantity) {
+    showLoading(true);
+    
+    fetch('/api/cart/update/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            'item_id': itemId,
+            'quantity': quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update item total
+            const totalElement = document.querySelector(`[data-item-id="${itemId}"].item-total`);
+            if (totalElement) {
+                totalElement.textContent = data.item_total + ' BYN';
+            }
+            
+            // Update cart totals
+            updateCartTotals(data.cart);
+            
+            // Update quantity controls
+            updateQuantityControls(itemId, quantity);
+            
+        } else {
+            throw new Error(data.message || 'Failed to update quantity');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to update quantity');
+    })
+    .finally(() => {
+        showLoading(false);
+    });
+}
+
+// Remove item from cart
+function removeItem(itemId) {
+    if (!confirm('Are you sure you want to remove this item from your cart?')) {
+        return;
+    }
+    
+    showLoading(true);
+    
+    fetch('/api/cart/remove/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            'item_id': itemId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remove row with animation
+            const row = document.querySelector(`tr[data-item-id="${itemId}"]`);
+            if (row) {
+                row.style.transition = 'opacity 0.3s ease';
+                row.style.opacity = '0';
+                setTimeout(() => {
+                    row.remove();
+                    
+                    // Check if cart is empty
+                    const remainingItems = document.querySelectorAll('tr.cart-item').length;
+                    if (remainingItems === 0) {
+                        window.location.reload();
+                    } else {
+                        updateCartTotals(data.cart);
+                    }
+                }, 300);
+            }
+        } else {
+            throw new Error(data.message || 'Failed to remove item');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to remove item');
+    })
+    .finally(() => {
+        showLoading(false);
+    });
+}
+
+// Clear entire cart
+function clearCart() {
+    if (!confirm('Are you sure you want to clear your entire cart? This action cannot be undone.')) {
+        return;
+    }
+    
+    showLoading(true);
+    
+    fetch('/api/cart/clear/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            throw new Error(data.message || 'Failed to clear cart');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to clear cart');
+    })
+    .finally(() => {
+        showLoading(false);
+    });
+}
+
+// Apply promocode
+function applyPromocode(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const input = form.querySelector('input[name="promocode"]');
+    const promocode = input.value.trim();
+    
+    if (!promocode) {
+        alert('Please enter a promocode');
+        return;
+    }
+    
+    showLoading(true);
+    
+    fetch('/api/cart/promocode/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            'promocode': promocode
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show applied promocode
+            document.getElementById('promocode-name').textContent = promocode;
+            document.getElementById('promocode-discount').textContent = data.discount;
+            document.getElementById('applied-promocode').style.display = 'block';
+            
+            // Clear form
+            form.reset();
+            
+            // Update totals
+            updateCartTotals(data.cart);
+            
+        } else {
+            throw new Error(data.message || 'Invalid promocode');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(error.message);
+    })
+    .finally(() => {
+        showLoading(false);
+    });
+}
+
+// Remove promocode
+function removePromocode() {
+    showLoading(true);
+    
+    fetch('/api/cart/promocode/remove/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('applied-promocode').style.display = 'none';
+            updateCartTotals(data.cart);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        showLoading(false);
+    });
+}
+
+// Save for later
+function saveForLater(itemId) {
+    if (!confirm('Move this item to your wishlist?')) {
+        return;
+    }
+    
+    fetch('/api/wishlist/add-from-cart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSrfToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            'item_id': itemId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Item moved to wishlist');
+            removeItem(itemId);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+// Utility functions
+function updateCartTotals(cart) {
+    const elements = {
+        'cart-subtotal': cart.subtotal,
+        'summary-subtotal': cart.subtotal,
+        'summary-discount': '-' + cart.discount,
+        'summary-tax': cart.tax,
+        'summary-total': cart.total
+    };
+    
+    Object.entries(elements).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value + ' BYN';
+        }
+    });
+}
+
+function updateQuantityControls(itemId, quantity) {
+    const decreaseBtn = document.querySelector(`[data-item-id="${itemId}"][data-action="decrease"]`);
+    const increaseBtn = document.querySelector(`[data-item-id="${itemId}"][data-action="increase"]`);
+    
+    if (decreaseBtn) decreaseBtn.disabled = quantity <= 1;
+    if (increaseBtn) increaseBtn.disabled = quantity >= 99;
+}
+
+function showLoading(show) {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.classList.toggle('d-none', !show);
+    }
+}
+
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+}
+
+// Additional utility functions
+function updateAllQuantities() {
+    const quantities = {};
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        quantities[input.dataset.itemId] = parseInt(input.value);
+    });
+    
+    showLoading(true);
+    
+    fetch('/api/cart/update-all/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({quantities})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error))
+    .finally(() => showLoading(false));
+}
+
+function saveCart() {
+    fetch('/api/cart/save/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCsrfToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Cart saved successfully!');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function shareCart() {
+    if (navigator.share) {
+        navigator.share({
+            title: 'My HeavyShop Cart',
+            text: 'Check out my book selection',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href);
+        alert('Cart link copied to clipboard!');
+    }
+}
+
+function printCart() {
+    window.print();
+}
+</script>
+
+<!-- Print styles -->
+<style media="print">
+@media print {
+    .btn, .card-footer, .card-header, .breadcrumb, .quantity-controls {
+        display: none !important;
+    }
+    
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .table {
+        font-size: 12px;
+    }
+}
+</style>
+
+{% endblock %}
