@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h2>Welcome to Book Store!</h2>
+{% if last_article %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h4>{{ last_article.title }}</h4>
+        <p>{{ last_article.summary }}</p>
+        <a href="{% url 'books:news_detail' last_article.pk %}" class="btn btn-primary">Read more</a>
+    </div>
+</div>
+{% else %}
+<p>No articles yet.</p>
+{% endif %}
+{% if weather %}
+<div class="alert alert-info mb-3">
+    <strong>Weather:</strong> {{ weather.desc }}<br>
+    Temperature: {{ weather.temp }}°C, Wind: {{ weather.windspeed }} m/s
+</div>
+{% elif weather_error %}
+<div class="alert alert-danger mb-3">Weather error: {{ weather_error }}</div>
+{% else %}
+<div class="alert alert-secondary mb-3">No weather data available.</div>
+{% endif %}
+{% if currency %}
+<div class="alert alert-warning mb-3">
+    <strong>Exchange Rates (USD):</strong> 1 USD = {{ currency.usd_pln }} PLN, 1 USD = {{ currency.usd_eur }} EUR
+</div>
+{% elif currency_error %}
+<div class="alert alert-danger mb-3">Currency error: {{ currency_error }}</div>
+{% else %}
+<div class="alert alert-secondary mb-3">No currency data available.</div>
+{% endif %}
+<h3 class="mt-4 mb-2">Календарь ({{ month_name|capfirst }} {{ year }})</h3>
+<div style="background:#fff;border:1px solid #dee2e6;border-radius:8px;max-width:340px;padding:10px 20px;margin-bottom:2rem;box-shadow:0 2px 8px #f1f1f1;">
+    <pre style="font-family:monospace;font-size:1.1em;line-height:1.2;margin:0;">{{ text_calendar }}</pre>
+</div>
+{% endblock %} 

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ book.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        {% if book.cover %}
+        <img src="{{ book.cover.url }}" class="img-fluid rounded" alt="{{ book.title }}">
+        {% else %}
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded" style="height: 400px;">
+            <i class="bi bi-book" style="font-size: 5rem;"></i>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-8">
+        <h1 class="mb-3">{{ book.title }}</h1>
+        <p class="lead">
+            By: {% for author in book.authors.all %}
+            {{ author.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        
+        <div class="mb-3">
+            {% for genre in book.genres.all %}
+            <span class="badge bg-primary">{{ genre.name }}</span>
+            {% endfor %}
+            {% if book.publisher %}
+            <span class="badge bg-secondary">{{ book.publisher.name }}</span>
+            {% endif %}
+        </div>
+
+        <p class="mb-3">{{ book.description }}</p>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                <p><strong>Price:</strong> ${{ book.price }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Stock:</strong> {{ book.quantity }}</p>
+                <p><strong>Created:</strong> {{ book.created_at|date:"F j, Y" }}</p>
+            </div>
+        </div>
+
+        {% if user.is_authenticated and book.quantity > 0 %}
+        <form action="{% url 'books:cart_add' book.id %}" method="post" class="mb-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-cart-plus"></i> Add to Cart
+            </button>
+        </form>
+        {% elif book.quantity == 0 %}
+        <div class="alert alert-warning">
+            This book is currently out of stock.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-8">
+        <h2 class="mb-4">Reviews</h2>
+        {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h5 class="card-title">{{ review.customer.user.get_full_name }}</h5>
+                    <div class="text-warning">
+                        {% for i in "12345"|make_list %}
+                        {% if forloop.counter <= review.rating %}
+                        <i class="bi bi-star-fill"></i>
+                        {% else %}
+                        <i class="bi bi-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <p class="card-text">{{ review.comment }}</p>
+                <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+                {% if user.is_authenticated and review.customer.user == user %}
+                <div class="mt-2">
+                    <a href="{% url 'books:edit_review' review.pk %}" class="btn btn-sm btn-outline-primary">Редактировать</a>
+                    <a href="{% url 'books:delete_review' review.pk %}" class="btn btn-sm btn-outline-danger">Удалить</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">No reviews yet.</p>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">Write a Review</h5>
+                <form method="post" action="{% url 'books:add_review' book.pk %}">
+                    {% csrf_token %}
+                    {{ review_form|crispy }}
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

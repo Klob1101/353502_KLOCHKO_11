@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-4">Privacy Policy</h1>
+            
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">1. Information We Collect</h2>
+                    <p>We collect information that you provide directly to us, including:</p>
+                    <ul>
+                        <li>Name and contact information</li>
+                        <li>Billing and shipping addresses</li>
+                        <li>Payment information</li>
+                        <li>Order history</li>
+                        <li>Communication preferences</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">2. How We Use Your Information</h2>
+                    <p>We use the information we collect to:</p>
+                    <ul>
+                        <li>Process your orders and payments</li>
+                        <li>Communicate with you about orders and services</li>
+                        <li>Send you marketing communications (with your consent)</li>
+                        <li>Improve our website and services</li>
+                        <li>Comply with legal obligations</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">3. Information Sharing</h2>
+                    <p>We may share your information with:</p>
+                    <ul>
+                        <li>Payment processors and shipping providers</li>
+                        <li>Service providers who assist our operations</li>
+                        <li>Law enforcement when required by law</li>
+                    </ul>
+                    <p>We do not sell your personal information to third parties.</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">4. Data Security</h2>
+                    <p>We implement appropriate security measures to protect your personal information, including:</p>
+                    <ul>
+                        <li>Encryption of sensitive data</li>
+                        <li>Secure servers and networks</li>
+                        <li>Regular security assessments</li>
+                        <li>Employee training on data protection</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">5. Your Rights</h2>
+                    <p>You have the right to:</p>
+                    <ul>
+                        <li>Access your personal information</li>
+                        <li>Correct inaccurate information</li>
+                        <li>Request deletion of your information</li>
+                        <li>Opt-out of marketing communications</li>
+                        <li>File a complaint with supervisory authorities</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5">6. Cookies and Tracking</h2>
+                    <p>We use cookies and similar technologies to:</p>
+                    <ul>
+                        <li>Remember your preferences</li>
+                        <li>Analyze website traffic</li>
+                        <li>Personalize content</li>
+                        <li>Improve user experience</li>
+                    </ul>
+                    <p>You can control cookie settings through your browser preferences.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="h5">7. Contact Us</h2>
+                    <p>If you have questions about our privacy policy or your data:</p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-envelope"></i> Email: privacy@bookstore.com</li>
+                        <li><i class="bi bi-telephone"></i> Phone: +1 (555) 123-4567</li>
+                        <li><i class="bi bi-geo-alt"></i> Address: 123 Book Street, Reading City, RC 12345</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Links</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">Terms of Service</a>
+                    <a href="#" class="list-group-item list-group-item-action">Cookie Policy</a>
+                    <a href="#" class="list-group-item list-group-item-action">GDPR Rights</a>
+                    <a href="{% url 'core:contacts' %}" class="list-group-item list-group-item-action">Contact Us</a>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Last Updated</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">This privacy policy was last updated on May 1, 2024.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

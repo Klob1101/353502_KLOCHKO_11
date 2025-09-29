@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Delete Vacancy{% endblock %}
+{% block content %}
+<h2>Delete Vacancy</h2>
+<p>Are you sure you want to delete the vacancy "{{ vacancy.title }}"?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'books:vacancy_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %} 
