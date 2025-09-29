@@ -298,5 +298,131 @@ class Employee(models.Model):
     description = models.TextField(blank=True)
     phone = models.CharField(max_length=30, blank=True)
     email = models.EmailField(blank=True)
+    
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Employee"
+        verbose_name_plural = "Employees"
+
+
+class Partner(models.Model):
+    """Company partners model"""
+    name = models.CharField(max_length=200)
+    logo = models.ImageField(upload_to='partners/', blank=True, null=True)
+    website = models.URLField(blank=True)
+    description = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Partner"
+        verbose_name_plural = "Partners"
+        ordering = ['name']
+
+
+class CompanyHistory(models.Model):
+    """Company history by years"""
+    year = models.PositiveIntegerField(unique=True)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    image = models.ImageField(upload_to='history/', blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.year} - {self.title}"
+
+    class Meta:
+        verbose_name = "Company History"
+        verbose_name_plural = "Company History"
+        ordering = ['-year']
+
+
+class Banner(models.Model):
+    """Homepage banners"""
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='banners/')
+    link = models.URLField(blank=True)
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "Banner"
+        verbose_name_plural = "Banners"
+        ordering = ['order']
+
+
+class CustomerReview(models.Model):
+    """Customer reviews (general, not book-specific)"""
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    title = models.CharField(max_length=200, blank=True)
+    text = models.TextField()
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Review by {self.customer} - {self.rating}★"
+
+    class Meta:
+        verbose_name = "Customer Review"
+        verbose_name_plural = "Customer Reviews"
+        ordering = ['-created_at']
+
+
+class FAQ(models.Model):
+    """Frequently Asked Questions"""
+    question = models.CharField(max_length=300)
+    answer = models.TextField()
+    category = models.CharField(max_length=100, blank=True)
+    is_published = models.BooleanField(default=True)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.question[:100]
+
+    class Meta:
+        verbose_name = "FAQ"
+        verbose_name_plural = "FAQs"
+        ordering = ['category', 'question']
+
+
+class Cart(models.Model):
+    """Persistent cart model"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Cart for {self.user.username}"
+
+    def get_total_cost(self):
+        return sum(item.get_cost() for item in self.items.all())
+
+    def get_total_items(self):
+        return sum(item.quantity for item in self.items.all())
+
+
+class CartItem(models.Model):
+    """Cart items"""
+    cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.quantity}x {self.book.title}"
+
+    def get_cost(self):
+        return self.book.price * self.quantity
+
+    class Meta:
+        unique_together = ['cart', 'book']

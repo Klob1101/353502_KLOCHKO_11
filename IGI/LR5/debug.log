@@ -5224,3 +5224,302 @@ django.db.utils.IntegrityError: UNIQUE constraint failed: books_review.book_id, 
 2025-06-24 11:04:56,003 - django.server - INFO - "GET / HTTP/1.1" 200 9069
 2025-06-24 11:04:56,275 - django.request - WARNING - Bad Request: /set-timezone/
 2025-06-24 11:04:56,275 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:35:26,323 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 15:35:36,922 - django.server - INFO - "GET / HTTP/1.1" 200 7796
+2025-09-26 15:35:38,919 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:35:38,919 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:35:39,531 - django.request - WARNING - Not Found: /favicon.ico
+2025-09-26 15:35:39,532 - django.server - WARNING - "GET /favicon.ico HTTP/1.1" 404 9761
+2025-09-26 15:38:16,028 - django.utils.autoreload - INFO - /home/batoshka/353502_KLOCHKO_11/IGI/LR5/books/models.py changed, reloading.
+2025-09-26 15:38:16,889 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 15:47:05,606 - django.request - WARNING - Not Found: /api/cart/add/
+2025-09-26 15:47:06,129 - django.request - WARNING - Forbidden: /api/cart/
+2025-09-26 15:47:07,435 - django.request - WARNING - Bad Request: /api/orders/
+2025-09-26 15:47:08,251 - django.request - ERROR - Internal Server Error: /api/reviews/
+Traceback (most recent call last):
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/django/views/generic/base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/rest_framework/generics.py", line 246, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/.venv/lib/python3.12/site-packages/rest_framework/mixins.py", line 19, in create
+    self.perform_create(serializer)
+  File "/home/batoshka/353502_KLOCHKO_11/IGI/LR5/books/api_views.py", line 363, in perform_create
+    raise serializers.ValidationError("You have already reviewed this book")
+          ^^^^^^^^^^^
+NameError: name 'serializers' is not defined. Did you mean: 'serializer'?
+2025-09-26 15:47:09,034 - django.request - WARNING - Forbidden: /api/reviews/
+2025-09-26 15:52:42,366 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 15:52:48,197 - django.server - INFO - "GET / HTTP/1.1" 200 7796
+2025-09-26 15:52:48,268 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:52:48,269 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:52:51,315 - django.server - INFO - "GET /news/6/ HTTP/1.1" 200 7127
+2025-09-26 15:52:51,353 - django.server - INFO - "GET /media/articles/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 200 134545
+2025-09-26 15:52:51,360 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:52:51,361 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:52:53,979 - django.server - INFO - "GET /news/ HTTP/1.1" 200 10423
+2025-09-26 15:52:54,015 - django.server - INFO - "GET /media/articles/000_CM0fSh9.jpg HTTP/1.1" 200 31797
+2025-09-26 15:52:54,015 - django.server - INFO - "GET /media/articles/6366726406.jpg HTTP/1.1" 200 54715
+2025-09-26 15:52:54,031 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:52:54,032 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:52:54,033 - django.server - INFO - "GET /media/articles/pjpg160x160.webp HTTP/1.1" 200 9528
+2025-09-26 15:52:54,033 - django.server - INFO - "GET /media/articles/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 200 86935
+2025-09-26 15:52:58,788 - django.server - INFO - "GET /contacts/ HTTP/1.1" 200 8209
+2025-09-26 15:52:58,805 - django.server - INFO - "GET /media/employees/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 200 134545
+2025-09-26 15:52:58,806 - django.server - INFO - "GET /media/employees/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 200 86935
+2025-09-26 15:52:58,830 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:52:58,832 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:53:02,595 - django.server - INFO - "GET /privacy/ HTTP/1.1" 200 6945
+2025-09-26 15:53:02,627 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:53:02,628 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:53:03,850 - django.server - INFO - "GET /promocodes/ HTTP/1.1" 200 7428
+2025-09-26 15:53:03,886 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:53:03,887 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:53:06,380 - django.server - INFO - "GET /vacancies/ HTTP/1.1" 200 7486
+2025-09-26 15:53:06,415 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:53:06,416 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:53:07,434 - django.server - INFO - "GET /cart/ HTTP/1.1" 302 0
+2025-09-26 15:53:07,450 - django.server - INFO - "GET /accounts/login/?next=/cart/ HTTP/1.1" 200 8425
+2025-09-26 15:53:07,520 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:53:07,520 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:53:13,082 - django.server - INFO - "POST /accounts/login/?next=/cart/ HTTP/1.1" 200 8615
+2025-09-26 15:53:13,117 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:53:13,118 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:56:00,615 - django.server - INFO - "GET /users/register/ HTTP/1.1" 200 10743
+2025-09-26 15:56:00,698 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:56:00,699 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:57:23,819 - django.server - INFO - "POST /users/register/ HTTP/1.1" 302 0
+2025-09-26 15:57:23,860 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26552
+2025-09-26 15:57:23,980 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:57:23,984 - django.server - INFO - "GET /media/books/covers/60387bfc9f91172d2d456286b4022991_uliFZ83.jpg HTTP/1.1" 200 30355
+2025-09-26 15:57:23,985 - django.server - INFO - "GET /media/books/covers/6366726406_ycMHOvm.jpg HTTP/1.1" 200 54715
+2025-09-26 15:57:23,991 - django.server - INFO - "GET /media/books/covers/6366726406.jpg HTTP/1.1" 200 54715
+2025-09-26 15:57:23,995 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:57:24,002 - django.server - INFO - "GET /media/books/covers/60387bfc9f91172d2d456286b4022991_D7UwTnN.jpg HTTP/1.1" 200 30355
+2025-09-26 15:57:24,005 - django.server - INFO - "GET /media/books/covers/NLB.jpg HTTP/1.1" 200 55881
+2025-09-26 15:57:37,483 - django.server - INFO - "GET /book/3/ HTTP/1.1" 200 12776
+2025-09-26 15:57:37,518 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:57:37,518 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:57:41,112 - django.server - INFO - "POST /cart/add/3/ HTTP/1.1" 302 0
+2025-09-26 15:57:41,206 - django.server - INFO - "GET /users/profile/ HTTP/1.1" 200 46725
+2025-09-26 15:57:41,656 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:57:41,656 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:58:12,995 - django.server - INFO - "POST /users/profile/ HTTP/1.1" 200 46942
+2025-09-26 15:58:13,058 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:58:13,058 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:58:38,474 - django.server - INFO - "POST /users/profile/ HTTP/1.1" 302 0
+2025-09-26 15:58:38,558 - django.server - INFO - "GET /users/profile/ HTTP/1.1" 200 47369
+2025-09-26 15:58:38,639 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:58:38,640 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:58:41,896 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26277
+2025-09-26 15:58:41,933 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:58:41,934 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:58:43,350 - django.server - INFO - "GET /book/3/ HTTP/1.1" 200 12776
+2025-09-26 15:58:43,391 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:58:43,392 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:58:44,399 - django.server - INFO - "POST /cart/add/3/ HTTP/1.1" 302 0
+2025-09-26 15:58:44,407 - django.server - INFO - "GET /cart/ HTTP/1.1" 200 11543
+2025-09-26 15:58:44,482 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:58:44,482 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:58:47,705 - django.server - INFO - "GET /order/create/ HTTP/1.1" 200 10036
+2025-09-26 15:58:47,743 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:58:47,743 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:58:52,086 - django.server - INFO - "POST /order/create/ HTTP/1.1" 302 0
+2025-09-26 15:58:52,102 - django.server - INFO - "GET /order/7/ HTTP/1.1" 200 11843
+2025-09-26 15:58:52,176 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:58:52,177 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:00,627 - django.server - INFO - "GET /users/profile/ HTTP/1.1" 200 47089
+2025-09-26 15:59:00,669 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:00,670 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:07,648 - django.server - INFO - "GET /orders/ HTTP/1.1" 200 8632
+2025-09-26 15:59:07,688 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:07,689 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:13,369 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26277
+2025-09-26 15:59:13,413 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:13,414 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:27,520 - django.server - INFO - "GET /books/?genre=3 HTTP/1.1" 200 11049
+2025-09-26 15:59:27,564 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:27,564 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:32,286 - django.server - INFO - "GET /books/?genre=1 HTTP/1.1" 200 20983
+2025-09-26 15:59:32,326 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:32,327 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:33,546 - django.server - INFO - "GET /vacancies/ HTTP/1.1" 200 8497
+2025-09-26 15:59:33,582 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:33,583 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:35,644 - django.server - INFO - "GET /about/ HTTP/1.1" 200 7950
+2025-09-26 15:59:35,685 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:35,685 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:36,755 - django.server - INFO - "GET /news/ HTTP/1.1" 200 11434
+2025-09-26 15:59:36,782 - django.server - INFO - "GET /media/articles/6366726406.jpg HTTP/1.1" 200 54715
+2025-09-26 15:59:36,783 - django.server - INFO - "GET /media/articles/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 200 134545
+2025-09-26 15:59:36,805 - django.server - INFO - "GET /media/articles/000_CM0fSh9.jpg HTTP/1.1" 200 31797
+2025-09-26 15:59:36,806 - django.server - INFO - "GET /media/articles/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 200 86935
+2025-09-26 15:59:36,807 - django.server - INFO - "GET /media/articles/pjpg160x160.webp HTTP/1.1" 200 9528
+2025-09-26 15:59:36,807 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:36,809 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:43,817 - django.server - INFO - "GET /terms/ HTTP/1.1" 200 8318
+2025-09-26 15:59:43,865 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:43,866 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:46,697 - django.server - INFO - "GET /contacts/ HTTP/1.1" 200 9220
+2025-09-26 15:59:46,723 - django.server - INFO - "GET /media/employees/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 200 86935
+2025-09-26 15:59:46,724 - django.server - INFO - "GET /media/employees/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 200 134545
+2025-09-26 15:59:46,737 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:46,737 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:50,802 - django.server - INFO - "GET /privacy/ HTTP/1.1" 200 7956
+2025-09-26 15:59:50,844 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:50,844 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:52,166 - django.server - INFO - "GET /promocodes/ HTTP/1.1" 200 8439
+2025-09-26 15:59:52,205 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:52,205 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 15:59:54,332 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26277
+2025-09-26 15:59:54,375 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 15:59:54,376 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:00:13,440 - django.request - WARNING - Bad Request: /api/cart/add/
+2025-09-26 16:00:13,708 - django.request - WARNING - Not Found: /api/cart/add/
+2025-09-26 16:00:14,274 - django.request - WARNING - Forbidden: /api/cart/
+2025-09-26 16:00:15,626 - django.request - WARNING - Bad Request: /api/orders/
+2025-09-26 16:00:16,456 - django.request - WARNING - Bad Request: /api/reviews/
+2025-09-26 16:00:17,503 - django.request - WARNING - Forbidden: /api/reviews/
+2025-09-26 16:00:39,755 - django.request - WARNING - Bad Request: /api/cart/add/
+2025-09-26 16:00:40,020 - django.request - WARNING - Not Found: /api/cart/add/
+2025-09-26 16:00:40,548 - django.request - WARNING - Forbidden: /api/cart/
+2025-09-26 16:00:41,873 - django.request - WARNING - Bad Request: /api/orders/
+2025-09-26 16:00:42,668 - django.request - WARNING - Bad Request: /api/reviews/
+2025-09-26 16:00:43,707 - django.request - WARNING - Forbidden: /api/reviews/
+2025-09-26 16:24:46,606 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:34:51,630 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:34:58,292 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26277
+2025-09-26 16:34:58,366 - django.server - INFO - "GET /media/books/covers/60387bfc9f91172d2d456286b4022991_uliFZ83.jpg HTTP/1.1" 304 0
+2025-09-26 16:34:58,368 - django.server - INFO - "GET /media/books/covers/6366726406_ycMHOvm.jpg HTTP/1.1" 304 0
+2025-09-26 16:34:58,414 - django.server - INFO - "GET /media/books/covers/60387bfc9f91172d2d456286b4022991_D7UwTnN.jpg HTTP/1.1" 304 0
+2025-09-26 16:34:58,418 - django.server - INFO - "GET /media/books/covers/NLB.jpg HTTP/1.1" 304 0
+2025-09-26 16:34:58,425 - django.server - INFO - "GET /media/books/covers/6366726406.jpg HTTP/1.1" 304 0
+2025-09-26 16:34:58,443 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:34:58,445 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:00,321 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26277
+2025-09-26 16:35:00,372 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:00,373 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:02,287 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26277
+2025-09-26 16:35:02,335 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:02,336 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:03,629 - django.server - INFO - "GET /cart/ HTTP/1.1" 200 8992
+2025-09-26 16:35:03,676 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:03,676 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:05,923 - django.server - INFO - "GET /vacancies/ HTTP/1.1" 200 8497
+2025-09-26 16:35:05,960 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:05,960 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:07,527 - django.server - INFO - "GET /news/ HTTP/1.1" 200 11434
+2025-09-26 16:35:07,550 - django.server - INFO - "GET /media/articles/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 304 0
+2025-09-26 16:35:07,554 - django.server - INFO - "GET /media/articles/6366726406.jpg HTTP/1.1" 304 0
+2025-09-26 16:35:07,568 - django.server - INFO - "GET /media/articles/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 304 0
+2025-09-26 16:35:07,572 - django.server - INFO - "GET /media/articles/000_CM0fSh9.jpg HTTP/1.1" 304 0
+2025-09-26 16:35:07,572 - django.server - INFO - "GET /media/articles/pjpg160x160.webp HTTP/1.1" 304 0
+2025-09-26 16:35:07,575 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:07,576 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:08,596 - django.server - INFO - "GET /promocodes/ HTTP/1.1" 200 8439
+2025-09-26 16:35:08,632 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:08,632 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:13,079 - django.server - INFO - "GET / HTTP/1.1" 200 8807
+2025-09-26 16:35:13,120 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:13,121 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:15,963 - django.server - INFO - "GET /users/profile/ HTTP/1.1" 200 47089
+2025-09-26 16:35:16,039 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:16,040 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:28,354 - django.server - INFO - "GET /orders/ HTTP/1.1" 200 8632
+2025-09-26 16:35:28,392 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:28,392 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:31,064 - django.server - INFO - "GET /terms/ HTTP/1.1" 200 8318
+2025-09-26 16:35:31,101 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:31,101 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:32,242 - django.server - INFO - "GET /news/ HTTP/1.1" 200 11434
+2025-09-26 16:35:32,280 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:32,280 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:35,293 - django.server - INFO - "GET /contacts/ HTTP/1.1" 200 9220
+2025-09-26 16:35:35,338 - django.server - INFO - "GET /media/employees/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 304 0
+2025-09-26 16:35:35,344 - django.server - INFO - "GET /media/employees/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 304 0
+2025-09-26 16:35:35,345 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:35,346 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:35:36,910 - django.server - INFO - "GET /books/ HTTP/1.1" 200 26277
+2025-09-26 16:35:36,952 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:35:36,952 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:36:14,248 - django.utils.autoreload - INFO - /home/batoshka/353502_KLOCHKO_11/IGI/LR5/heavyshop/urls.py changed, reloading.
+2025-09-26 16:36:14,756 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:52:46,043 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:54:52,203 - django.utils.autoreload - INFO - /home/batoshka/353502_KLOCHKO_11/IGI/LR5/books/admin.py changed, reloading.
+2025-09-26 16:54:52,654 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:55:08,633 - django.utils.autoreload - INFO - /home/batoshka/353502_KLOCHKO_11/IGI/LR5/books/admin.py changed, reloading.
+2025-09-26 16:55:09,109 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:55:20,981 - django.utils.autoreload - INFO - /home/batoshka/353502_KLOCHKO_11/IGI/LR5/books/forms.py changed, reloading.
+2025-09-26 16:55:21,433 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:55:30,237 - django.utils.autoreload - INFO - /home/batoshka/353502_KLOCHKO_11/IGI/LR5/books/forms.py changed, reloading.
+2025-09-26 16:55:30,771 - django.utils.autoreload - INFO - Watching for file changes with StatReloader
+2025-09-26 16:55:36,531 - django.server - INFO - "GET / HTTP/1.1" 200 8807
+2025-09-26 16:55:36,572 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:36,572 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:39,248 - django.server - INFO - "GET /promocodes/ HTTP/1.1" 200 8439
+2025-09-26 16:55:39,282 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:39,282 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:42,339 - django.server - INFO - "GET /privacy/ HTTP/1.1" 200 7956
+2025-09-26 16:55:42,377 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:42,378 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:45,265 - django.server - INFO - "GET /cart/ HTTP/1.1" 200 8992
+2025-09-26 16:55:45,300 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:45,301 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:46,251 - django.server - INFO - "GET /vacancies/ HTTP/1.1" 200 8497
+2025-09-26 16:55:46,288 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:46,289 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:47,944 - django.server - INFO - "GET /about/ HTTP/1.1" 200 7950
+2025-09-26 16:55:47,983 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:47,983 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:49,014 - django.server - INFO - "GET /news/ HTTP/1.1" 200 11434
+2025-09-26 16:55:49,041 - django.server - INFO - "GET /media/articles/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 304 0
+2025-09-26 16:55:49,043 - django.server - INFO - "GET /media/articles/6366726406.jpg HTTP/1.1" 304 0
+2025-09-26 16:55:49,057 - django.server - INFO - "GET /media/articles/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 304 0
+2025-09-26 16:55:49,061 - django.server - INFO - "GET /media/articles/pjpg160x160.webp HTTP/1.1" 304 0
+2025-09-26 16:55:49,063 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:49,064 - django.server - INFO - "GET /media/articles/000_CM0fSh9.jpg HTTP/1.1" 304 0
+2025-09-26 16:55:49,064 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:50,053 - django.server - INFO - "GET /terms/ HTTP/1.1" 200 8318
+2025-09-26 16:55:50,093 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:50,094 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:52,038 - django.server - INFO - "GET /contacts/ HTTP/1.1" 200 9220
+2025-09-26 16:55:52,063 - django.server - INFO - "GET /media/employees/e43a6f54c39ac385832b30d210.jpg HTTP/1.1" 304 0
+2025-09-26 16:55:52,064 - django.server - INFO - "GET /media/employees/fe33777be6f4a4b22306d535d9dc0c84.jpg HTTP/1.1" 304 0
+2025-09-26 16:55:52,078 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:52,079 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:53,314 - django.server - INFO - "GET /privacy/ HTTP/1.1" 200 7956
+2025-09-26 16:55:53,353 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:53,353 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:56,086 - django.server - INFO - "GET /promocodes/ HTTP/1.1" 200 8439
+2025-09-26 16:55:56,124 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:56,124 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:56,916 - django.server - INFO - "GET /privacy/ HTTP/1.1" 200 7956
+2025-09-26 16:55:56,956 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:56,956 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:55:59,558 - django.server - INFO - "GET /terms/ HTTP/1.1" 200 8318
+2025-09-26 16:55:59,603 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:55:59,603 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:56:02,350 - django.server - INFO - "GET /vacancies/ HTTP/1.1" 200 8497
+2025-09-26 16:56:02,388 - django.request - WARNING - Bad Request: /set-timezone/
+2025-09-26 16:56:02,388 - django.server - WARNING - "POST /set-timezone/ HTTP/1.1" 400 50
+2025-09-26 16:56:03,781 - django.server - INFO - "GET /about/ HTTP/1.1" 200 7950

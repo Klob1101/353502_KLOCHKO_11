@@ -1,0 +1,557 @@
+{% extends 'base_enhanced.html' %}
+{% load static %}
+
+{% block title %}HeavyShop - Premier Online Bookstore in Belarus{% endblock %}
+
+{% block meta_description %}
+Discover thousands of books at HeavyShop, Belarus's premier online bookstore. Find fiction, non-fiction, educational materials and more with fast delivery and excellent customer service.
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "HeavyShop",
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "{{ request.scheme }}://{{ request.get_host }}{% url 'books:book_list' %}?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+    }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section with Company Banners -->
+<section class="hero-section mb-5" aria-label="Featured promotions">
+    {% if banners %}
+        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for banner in banners %}
+                    <button type="button" 
+                            data-bs-target="#heroCarousel" 
+                            data-bs-slide-to="{{ forloop.counter0 }}" 
+                            {% if forloop.first %}class="active"{% endif %}
+                            aria-current="{% if forloop.first %}true{% endif %}"
+                            aria-label="Slide {{ forloop.counter }}">
+                    </button>
+                {% endfor %}
+            </div>
+            
+            <div class="carousel-inner rounded">
+                {% for banner in banners %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ banner.image.url }}" 
+                             class="d-block w-100" 
+                             alt="{{ banner.title }}"
+                             style="height: 400px; object-fit: cover;">
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-3">
+                            <h2 class="h3">{{ banner.title }}</h2>
+                            {% if banner.description %}
+                                <p>{{ banner.description }}</p>
+                            {% endif %}
+                            {% if banner.link %}
+                                <a href="{{ banner.link }}" class="btn btn-primary">Learn More</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    {% endif %}
+</section>
+
+<div class="row">
+    <!-- Main Content Area -->
+    <div class="col-lg-8">
+        <!-- Featured Products/Services Catalog -->
+        <section class="featured-books mb-5" aria-labelledby="featured-heading">
+            <header>
+                <h2 id="featured-heading" class="h3 mb-4">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    Featured Books
+                </h2>
+            </header>
+            
+            {% if featured_books %}
+                <div class="row g-4">
+                    {% for book in featured_books %}
+                        <div class="col-md-6 col-lg-3">
+                            <article class="card book-card h-100" itemscope itemtype="http://schema.org/Book">
+                                <div class="position-relative">
+                                    {% if book.cover %}
+                                        <img src="{{ book.cover.url }}" 
+                                             class="card-img-top" 
+                                             alt="Cover of {{ book.title }}"
+                                             style="height: 200px; object-fit: cover;"
+                                             itemprop="image">
+                                    {% else %}
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                             style="height: 200px;">
+                                            <i class="bi bi-book text-muted" style="font-size: 3rem;"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if not book.is_available %}
+                                        <span class="badge bg-danger position-absolute top-0 end-0 m-2">
+                                            Out of Stock
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="card-body d-flex flex-column">
+                                    <h3 class="card-title h6" itemprop="name">
+                                        <a href="{{ book.get_absolute_url }}" class="text-decoration-none">
+                                            {{ book.title|truncatechars:50 }}
+                                        </a>
+                                    </h3>
+                                    
+                                    <p class="text-muted small mb-2" itemprop="author">
+                                        by {% for author in book.authors.all %}
+                                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    
+                                    {% if book.avg_rating %}
+                                        <div class="rating-stars mb-2" itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+                                            <meta itemprop="ratingValue" content="{{ book.avg_rating }}">
+                                            <meta itemprop="reviewCount" content="{{ book.reviews_count }}">
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= book.avg_rating %}
+                                                    <i class="bi bi-star-fill"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <small class="text-muted">({{ book.reviews_count }})</small>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="price-tag" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                                <meta itemprop="priceCurrency" content="BYN">
+                                                <span itemprop="price" content="{{ book.price }}">{{ book.price }} BYN</span>
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="btn-group w-100" role="group">
+                                            <a href="{{ book.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                                                View Details
+                                            </a>
+                                            {% if book.is_available %}
+                                                <button type="button" 
+                                                        class="btn btn-primary btn-sm add-to-cart-btn"
+                                                        data-book-id="{{ book.id }}"
+                                                        {% if not user.is_authenticated %}disabled{% endif %}>
+                                                    <i class="bi bi-cart-plus"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'books:book_list' %}" class="btn btn-outline-primary">
+                        View All Books <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    No featured books available at the moment.
+                </div>
+            {% endif %}
+        </section>
+        
+        <!-- Latest Article Section -->
+        {% if latest_article %}
+            <section class="latest-news mb-5" aria-labelledby="news-heading">
+                <header>
+                    <h2 id="news-heading" class="h3 mb-4">
+                        <i class="bi bi-newspaper text-primary"></i>
+                        Latest News
+                    </h2>
+                </header>
+                
+                <article class="card" itemscope itemtype="http://schema.org/NewsArticle">
+                    <div class="row g-0">
+                        {% if latest_article.image %}
+                            <div class="col-md-4">
+                                <img src="{{ latest_article.image.url }}" 
+                                     class="img-fluid rounded-start h-100" 
+                                     alt="Article image"
+                                     style="object-fit: cover;"
+                                     itemprop="image">
+                            </div>
+                        {% endif %}
+                        
+                        <div class="col-md-{% if latest_article.image %}8{% else %}12{% endif %}">
+                            <div class="card-body">
+                                <h3 class="card-title h5" itemprop="headline">
+                                    <a href="{% url 'books:news_detail' latest_article.pk %}" 
+                                       class="text-decoration-none">
+                                        {{ latest_article.title }}
+                                    </a>
+                                </h3>
+                                
+                                <p class="card-text" itemprop="description">
+                                    {{ latest_article.summary }}
+                                </p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <time datetime="{{ latest_article.published_at|date:'c' }}" itemprop="datePublished">
+                                            {{ latest_article.published_at|date:"F j, Y" }}
+                                        </time>
+                                    </small>
+                                    
+                                    <a href="{% url 'books:news_detail' latest_article.pk %}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        Read More <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <aside class="col-lg-4">
+        <!-- Company Partners -->
+        {% if partners %}
+            <section class="partners mb-5" aria-labelledby="partners-heading">
+                <header>
+                    <h2 id="partners-heading" class="h4 mb-3">
+                        <i class="bi bi-people text-success"></i>
+                        Our Partners
+                    </h2>
+                </header>
+                
+                <div class="row g-3">
+                    {% for partner in partners %}
+                        <div class="col-6 col-md-4 col-lg-6">
+                            <div class="card text-center h-100 border-0 bg-light">
+                                {% if partner.website %}
+                                    <a href="{{ partner.website }}" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="text-decoration-none"
+                                       title="Visit {{ partner.name }} website">
+                                {% endif %}
+                                
+                                <div class="card-body p-2">
+                                    {% if partner.logo %}
+                                        <img src="{{ partner.logo.url }}" 
+                                             alt="{{ partner.name }} logo"
+                                             class="img-fluid mb-2"
+                                             style="max-height: 60px; width: auto;">
+                                    {% endif %}
+                                    
+                                    <h3 class="card-title h6 mb-0">{{ partner.name }}</h3>
+                                    
+                                    {% if partner.description %}
+                                        <p class="card-text small text-muted">
+                                            {{ partner.description|truncatechars:50 }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if partner.website %}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+        
+        <!-- Quick Links -->
+        <section class="quick-links mb-5" aria-labelledby="quicklinks-heading">
+            <header>
+                <h2 id="quicklinks-heading" class="h4 mb-3">
+                    <i class="bi bi-lightning text-warning"></i>
+                    Quick Access
+                </h2>
+            </header>
+            
+            <nav>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <a href="{% url 'books:book_list' %}" class="text-decoration-none">
+                            <i class="bi bi-book text-primary"></i>
+                            Browse All Books
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'books:promocodes' %}" class="text-decoration-none">
+                            <i class="bi bi-tags text-success"></i>
+                            Active Promocodes
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'books:vacancies' %}" class="text-decoration-none">
+                            <i class="bi bi-briefcase text-info"></i>
+                            Career Opportunities
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'books:reviews' %}" class="text-decoration-none">
+                            <i class="bi bi-chat-quote text-warning"></i>
+                            Customer Reviews
+                        </a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'books:faq' %}" class="text-decoration-none">
+                            <i class="bi bi-question-circle text-secondary"></i>
+                            FAQ & Help
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+        
+        <!-- Company Info Widget -->
+        {% if company_info %}
+            <section class="company-widget mb-5" aria-labelledby="company-heading">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <header>
+                            <h2 id="company-heading" class="card-title h5">
+                                <i class="bi bi-building"></i>
+                                {{ company_info.name }}
+                            </h2>
+                        </header>
+                        
+                        <p class="card-text small">
+                            {{ company_info.description|truncatechars:150 }}
+                        </p>
+                        
+                        {% if company_info.founded_year %}
+                            <p class="small mb-0">
+                                <strong>Established:</strong> {{ company_info.founded_year }}
+                            </p>
+                        {% endif %}
+                        
+                        <a href="{% url 'books:company_info' %}" 
+                           class="btn btn-light btn-sm mt-2">
+                            Learn More About Us
+                        </a>
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+        
+        <!-- Sample HTML5 Elements Showcase -->
+        <section class="html5-showcase mb-5" aria-labelledby="elements-heading">
+            <header>
+                <h2 id="elements-heading" class="h4 mb-3">
+                    <i class="bi bi-code-slash text-info"></i>
+                    Literary Corner
+                </h2>
+            </header>
+            
+            <div class="card">
+                <div class="card-body">
+                    <!-- Quote/Citation -->
+                    <figure>
+                        <blockquote class="citation">
+                            <p><q>A room without books is like a body without a soul.</q></p>
+                        </blockquote>
+                        <figcaption class="text-end text-muted small">
+                            — <cite>Cicero</cite>
+                        </figcaption>
+                    </figure>
+                    
+                    <!-- Abbreviation -->
+                    <p class="small">
+                        Our <abbr title="Application Programming Interface" class="abbreviation">API</abbr> 
+                        allows developers to integrate with our catalog.
+                    </p>
+                    
+                    <!-- Definition -->
+                    <dl>
+                        <dt>Bibliography</dt>
+                        <dd class="definition">
+                            A list of books, articles, and other sources of information on a particular subject.
+                        </dd>
+                    </dl>
+                    
+                    <!-- Sample poem with line breaks -->
+                    <div class="poem">
+                        <p>
+                            Books are the carriers of civilization.<br>
+                            Without books, history is silent,<br>
+                            literature dumb, science crippled,<br>
+                            thought and speculation at a standstill.
+                        </p>
+                    </div>
+                    
+                    <!-- Code listing example -->
+                    <details>
+                        <summary>Quick Search Tips</summary>
+                        <pre><code>
+Search syntax examples:
+- "exact phrase"    → Find exact matches
+- author:tolkien    → Find by author
+- genre:fantasy     → Filter by genre
+- isbn:1234567890   → Search by ISBN
+                        </code></pre>
+                    </details>
+                    
+                    <!-- Current time -->
+                    <p class="text-muted small mt-3">
+                        <i class="bi bi-clock"></i>
+                        Last updated: <time datetime="{{ current_date|date:'c' }}">{{ current_date|date:"F j, Y g:i A" }}</time>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </aside>
+</div>
+
+<!-- Newsletter Subscription -->
+<section class="newsletter-section bg-light p-4 rounded mb-5" aria-labelledby="newsletter-heading">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <header>
+                <h2 id="newsletter-heading" class="h4 mb-2">
+                    <i class="bi bi-envelope text-primary"></i>
+                    Stay Updated
+                </h2>
+            </header>
+            <p class="mb-0">Subscribe to our newsletter for the latest book releases and exclusive offers.</p>
+        </div>
+        <div class="col-md-4">
+            <form class="d-flex" method="post" action="#" novalidate>
+                <input type="email" 
+                       class="form-control me-2" 
+                       placeholder="Enter your email..."
+                       required
+                       aria-label="Email address">
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add to cart functionality
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const bookId = this.dataset.bookId;
+            
+            if (!bookId) return;
+            
+            // Disable button temporarily
+            this.disabled = true;
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+            
+            // Simulate API call (replace with actual AJAX call)
+            fetch(`/api/cart/add/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                },
+                body: JSON.stringify({
+                    'book_id': bookId,
+                    'quantity': 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart count
+                    const cartCount = document.getElementById('cart-count');
+                    if (cartCount && data.cart && data.cart.total_items) {
+                        cartCount.textContent = data.cart.total_items;
+                    }
+                    
+                    // Show success message
+                    this.innerHTML = '<i class="bi bi-check-lg"></i>';
+                    this.classList.replace('btn-primary', 'btn-success');
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.classList.replace('btn-success', 'btn-primary');
+                        this.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'Failed to add to cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+                this.innerHTML = originalText;
+                this.disabled = false;
+                
+                // Show error message
+                alert('Failed to add item to cart. Please try again.');
+            });
+        });
+    });
+    
+    // Newsletter form validation
+    const newsletterForm = document.querySelector('form[action="#"]');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const emailInput = this.querySelector('input[type="email"]');
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            if (emailInput.checkValidity()) {
+                // Simulate subscription
+                submitButton.innerHTML = 'Subscribing...';
+                submitButton.disabled = true;
+                
+                setTimeout(() => {
+                    submitButton.innerHTML = 'Subscribed!';
+                    submitButton.classList.replace('btn-primary', 'btn-success');
+                    emailInput.value = '';
+                    
+                    setTimeout(() => {
+                        submitButton.innerHTML = 'Subscribe';
+                        submitButton.classList.replace('btn-success', 'btn-primary');
+                        submitButton.disabled = false;
+                    }, 3000);
+                }, 1000);
+            } else {
+                emailInput.reportValidity();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

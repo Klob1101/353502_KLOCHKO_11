@@ -1,0 +1,736 @@
+{% extends 'base_enhanced.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ book.title }} - HeavyShop{% endblock %}
+
+{% block meta_description %}
+{{ book.description|truncatechars:155 }} Available at HeavyShop with fast delivery.
+{% endblock %}
+
+{% block meta_keywords %}
+{{ book.title }}, {% for author in book.authors.all %}{{ author.name }}{% if not forloop.last %}, {% endif %}{% endfor %}, {{ book.genre }}, buy book online, HeavyShop
+{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Book",
+    "name": "{{ book.title }}",
+    "author": [
+        {% for author in book.authors.all %}
+        {
+            "@type": "Person",
+            "name": "{{ author.name }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ],
+    "isbn": "{{ book.isbn }}",
+    "genre": "{{ book.genre }}",
+    "description": "{{ book.description|escape }}",
+    "publisher": {
+        "@type": "Organization",
+        "name": "{{ book.publisher }}"
+    },
+    "datePublished": "{{ book.publication_date|date:'Y-m-d' }}",
+    {% if book.cover %}
+    "image": "{{ request.scheme }}://{{ request.get_host }}{{ book.cover.url }}",
+    {% endif %}
+    "offers": {
+        "@type": "Offer",
+        "price": "{{ book.price }}",
+        "priceCurrency": "BYN",
+        "availability": "{% if book.is_available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+        "seller": {
+            "@type": "Organization",
+            "name": "HeavyShop"
+        }
+    },
+    {% if book.avg_rating %}
+    "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ book.avg_rating }}",
+        "reviewCount": "{{ book.reviews_count }}",
+        "bestRating": "5",
+        "worstRating": "1"
+    },
+    {% endif %}
+    "review": [
+        {% for review in reviews %}
+        {
+            "@type": "Review",
+            "author": {
+                "@type": "Person",
+                "name": "{{ review.customer.get_full_name|default:review.customer.user.username }}"
+            },
+            "datePublished": "{{ review.created_at|date:'Y-m-d' }}",
+            "reviewBody": "{{ review.comment|escape }}",
+            "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "{{ review.rating }}",
+                "bestRating": "5",
+                "worstRating": "1"
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb Navigation -->
+<nav aria-label="Breadcrumb">
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{% url 'books:home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'books:book_list' %}">Books</a></li>
+        {% if book.genre %}
+            <li class="breadcrumb-item">
+                <a href="{% url 'books:book_list' %}?genre={{ book.genre }}">{{ book.genre }}</a>
+            </li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{ book.title|truncatechars:30 }}</li>
+    </ol>
+</nav>
+
+<div class="row">
+    <!-- Main Book Content -->
+    <main class="col-lg-8">
+        <article itemscope itemtype="http://schema.org/Book">
+            <div class="row">
+                <!-- Book Cover -->
+                <div class="col-md-4">
+                    <figure class="text-center">
+                        {% if book.cover %}
+                            <img src="{{ book.cover.url }}" 
+                                 alt="Cover of {{ book.title }}"
+                                 class="img-fluid rounded shadow-sm"
+                                 style="max-width: 100%; height: auto;"
+                                 itemprop="image">
+                        {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center shadow-sm" 
+                                 style="height: 400px;">
+                                <i class="bi bi-book text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                        {% endif %}
+                        <figcaption class="mt-2 text-muted small">
+                            Cover image of {{ book.title }}
+                        </figcaption>
+                    </figure>
+                    
+                    <!-- Quick Actions -->
+                    <div class="d-grid gap-2 mt-3">
+                        {% if book.is_available %}
+                            <button type="button" 
+                                    class="btn btn-primary btn-lg add-to-cart-btn"
+                                    data-book-id="{{ book.id }}"
+                                    {% if not user.is_authenticated %}disabled title="Login required"{% endif %}>
+                                <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                            </button>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary btn-lg" disabled>
+                                <i class="bi bi-x-circle me-2"></i>Out of Stock
+                            </button>
+                        {% endif %}
+                        
+                        <button type="button" 
+                                class="btn btn-outline-secondary wishlist-btn"
+                                data-book-id="{{ book.id }}"
+                                {% if not user.is_authenticated %}disabled title="Login required"{% endif %}>
+                            <i class="bi bi-heart me-2"></i>Add to Wishlist
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Book Details -->
+                <div class="col-md-8">
+                    <header>
+                        <h1 class="display-6 mb-3" itemprop="name">{{ book.title }}</h1>
+                    </header>
+                    
+                    <div class="book-meta mb-4">
+                        <!-- Authors -->
+                        <p class="mb-2">
+                            <strong>Author(s):</strong>
+                            <span itemprop="author">
+                                {% for author in book.authors.all %}
+                                    <a href="{% url 'books:book_list' %}?author={{ author.name }}" 
+                                       class="text-decoration-none">
+                                        {{ author.name }}
+                                    </a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </span>
+                        </p>
+                        
+                        <!-- Rating -->
+                        {% if book.avg_rating %}
+                            <div class="rating-display mb-2" 
+                                 itemprop="aggregateRating" 
+                                 itemscope 
+                                 itemtype="http://schema.org/AggregateRating">
+                                <strong>Rating:</strong>
+                                <span class="rating-stars">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= book.avg_rating %}
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        {% else %}
+                                            <i class="bi bi-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                <span class="rating-text">
+                                    <span itemprop="ratingValue">{{ book.avg_rating }}</span>/5
+                                    (<span itemprop="reviewCount">{{ book.reviews_count }}</span> reviews)
+                                </span>
+                                <meta itemprop="bestRating" content="5">
+                                <meta itemprop="worstRating" content="1">
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Price -->
+                        <div class="price-section mb-3" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                            <span class="price-label">Price:</span>
+                            <span class="price-value h4 text-primary" itemprop="price" content="{{ book.price }}">
+                                {{ book.price }} <span class="currency" itemprop="priceCurrency" content="BYN">BYN</span>
+                            </span>
+                            <meta itemprop="availability" content="{% if book.is_available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}">
+                        </div>
+                    </div>
+                    
+                    <!-- Book Details Table -->
+                    <div class="table-responsive mb-4">
+                        <table class="table table-striped" summary="Book specifications and details">
+                            <caption>Detailed information about {{ book.title }}</caption>
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col" id="spec-attribute">Specification</th>
+                                    <th scope="col" id="spec-value">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" headers="spec-attribute">ISBN</th>
+                                    <td headers="spec-value" itemprop="isbn">{{ book.isbn|default:"Not available" }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" headers="spec-attribute">Genre</th>
+                                    <td headers="spec-value" itemprop="genre">{{ book.genre|default:"Not specified" }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" headers="spec-attribute">Publisher</th>
+                                    <td headers="spec-value" itemprop="publisher">{{ book.publisher|default:"Unknown" }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" headers="spec-attribute">Publication Date</th>
+                                    <td headers="spec-value">
+                                        {% if book.publication_date %}
+                                            <time datetime="{{ book.publication_date|date:'Y-m-d' }}" itemprop="datePublished">
+                                                {{ book.publication_date|date:"F j, Y" }}
+                                            </time>
+                                        {% else %}
+                                            Not available
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" headers="spec-attribute">Pages</th>
+                                    <td headers="spec-value" itemprop="numberOfPages">{{ book.pages|default:"Not specified" }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" headers="spec-attribute">Language</th>
+                                    <td headers="spec-value" itemprop="inLanguage">{{ book.language|default:"Not specified" }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" headers="spec-attribute">Stock Status</th>
+                                    <td headers="spec-value">
+                                        {% if book.is_available %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>In Stock
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle me-1"></i>Out of Stock
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Book Description -->
+                    <section class="description-section" aria-labelledby="description-heading">
+                        <header>
+                            <h2 id="description-heading" class="h4 mb-3">
+                                <i class="bi bi-file-text text-info"></i>
+                                Description
+                            </h2>
+                        </header>
+                        
+                        <div class="description-content" itemprop="description">
+                            {% if book.description %}
+                                <div class="formatted-text">
+                                    {{ book.description|linebreaks }}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No description available for this book.</p>
+                            {% endif %}
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </article>
+        
+        <!-- Audio/Video Section (if available) -->
+        {% if book.audio_sample or book.video_preview %}
+            <section class="media-section mt-5" aria-labelledby="media-heading">
+                <header>
+                    <h2 id="media-heading" class="h4 mb-3">
+                        <i class="bi bi-play-circle text-primary"></i>
+                        Preview Media
+                    </h2>
+                </header>
+                
+                <div class="row">
+                    {% if book.audio_sample %}
+                        <div class="col-md-6">
+                            <h3 class="h6">Audio Sample</h3>
+                            <audio controls class="w-100" preload="metadata">
+                                <source src="{{ book.audio_sample.url }}" type="audio/mpeg">
+                                <source src="{{ book.audio_sample.url }}" type="audio/ogg">
+                                Your browser does not support the audio element.
+                                <a href="{{ book.audio_sample.url }}" download>Download audio sample</a>
+                            </audio>
+                        </div>
+                    {% endif %}
+                    
+                    {% if book.video_preview %}
+                        <div class="col-md-6">
+                            <h3 class="h6">Video Preview</h3>
+                            <video controls class="w-100" preload="metadata" poster="{{ book.cover.url }}">
+                                <source src="{{ book.video_preview.url }}" type="video/mp4">
+                                <source src="{{ book.video_preview.url }}" type="video/webm">
+                                Your browser does not support the video element.
+                                <track kind="captions" srclang="en" label="English captions" src="#">
+                            </video>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        {% endif %}
+        
+        <!-- Reviews Section -->
+        <section class="reviews-section mt-5" aria-labelledby="reviews-heading">
+            <header>
+                <h2 id="reviews-heading" class="h4 mb-4">
+                    <i class="bi bi-chat-quote text-warning"></i>
+                    Customer Reviews
+                    {% if reviews.count > 0 %}
+                        <span class="badge bg-secondary ms-2">{{ reviews.count }}</span>
+                    {% endif %}
+                </h2>
+            </header>
+            
+            {% if user.is_authenticated %}
+                <!-- Add Review Form -->
+                <div class="add-review-section mb-4">
+                    <h3 class="h5">Write a Review</h3>
+                    <form method="post" action="{% url 'books:add_review' book.pk %}" class="review-form">
+                        {% csrf_token %}
+                        {{ review_form|crispy }}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>Submit Review
+                        </button>
+                    </form>
+                </div>
+                <hr>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <a href="{% url 'login' %}">Login</a> to write a review.
+                </div>
+            {% endif %}
+            
+            <!-- Existing Reviews -->
+            {% if reviews %}
+                <div class="reviews-list">
+                    {% for review in reviews %}
+                        <article class="review-item mb-4 p-3 border rounded" 
+                                 itemscope 
+                                 itemtype="http://schema.org/Review">
+                            <header class="review-header d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h3 class="reviewer-name h6 mb-1" itemprop="author">
+                                        <i class="bi bi-person-circle text-muted me-1"></i>
+                                        {{ review.customer.get_full_name|default:review.customer.user.username }}
+                                    </h3>
+                                    
+                                    <div class="review-rating" itemprop="reviewRating" itemscope itemtype="http://schema.org/Rating">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= review.rating %}
+                                                <i class="bi bi-star-fill text-warning"></i>
+                                            {% else %}
+                                                <i class="bi bi-star text-muted"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <meta itemprop="ratingValue" content="{{ review.rating }}">
+                                        <meta itemprop="bestRating" content="5">
+                                        <meta itemprop="worstRating" content="1">
+                                    </div>
+                                </div>
+                                
+                                <time datetime="{{ review.created_at|date:'c' }}" 
+                                      class="review-date text-muted small"
+                                      itemprop="datePublished">
+                                    {{ review.created_at|date:"M j, Y" }}
+                                </time>
+                            </header>
+                            
+                            <div class="review-content" itemprop="reviewBody">
+                                <p>{{ review.comment|linebreaks }}</p>
+                            </div>
+                            
+                            <!-- Review Actions -->
+                            {% if user.is_authenticated %}
+                                <footer class="review-actions">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-primary like-review-btn"
+                                            data-review-id="{{ review.id }}">
+                                        <i class="bi bi-hand-thumbs-up me-1"></i>
+                                        Helpful <span class="likes-count">(0)</span>
+                                    </button>
+                                </footer>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination for reviews -->
+                {% if reviews.has_other_pages %}
+                    <nav aria-label="Reviews pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if reviews.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ reviews.previous_page_number }}">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+                            {% endif %}
+                            
+                            {% for num in reviews.paginator.page_range %}
+                                {% if reviews.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > reviews.number|add:'-3' and num < reviews.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if reviews.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ reviews.next_page_number }}">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="no-reviews text-center py-5">
+                    <i class="bi bi-chat-quote text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">No reviews yet. Be the first to review this book!</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+    
+    <!-- Sidebar -->
+    <aside class="col-lg-4">
+        <!-- Related Books -->
+        {% if related_books %}
+            <section class="related-books mb-4" aria-labelledby="related-heading">
+                <header>
+                    <h2 id="related-heading" class="h5 mb-3">
+                        <i class="bi bi-collection text-success"></i>
+                        Related Books
+                    </h2>
+                </header>
+                
+                <div class="list-group">
+                    {% for related_book in related_books %}
+                        <a href="{{ related_book.get_absolute_url }}" 
+                           class="list-group-item list-group-item-action">
+                            <div class="d-flex align-items-center">
+                                {% if related_book.cover %}
+                                    <img src="{{ related_book.cover.url }}" 
+                                         alt="{{ related_book.title }}"
+                                         class="me-3 rounded"
+                                         style="width: 50px; height: 60px; object-fit: cover;">
+                                {% endif %}
+                                
+                                <div class="flex-grow-1">
+                                    <h3 class="h6 mb-1">{{ related_book.title|truncatechars:40 }}</h3>
+                                    <p class="text-muted small mb-1">
+                                        {% for author in related_book.authors.all %}
+                                            {{ author.name }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    <span class="text-primary small">{{ related_book.price }} BYN</span>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+        
+        <!-- Book Information Widget -->
+        <section class="book-info-widget mb-4" aria-labelledby="info-heading">
+            <div class="card">
+                <div class="card-header">
+                    <h2 id="info-heading" class="h6 mb-0">
+                        <i class="bi bi-info-circle text-info"></i>
+                        Book Information
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <dl class="row small mb-0">
+                        <dt class="col-6">Stock ID:</dt>
+                        <dd class="col-6">#{{ book.id|stringformat:"05d" }}</dd>
+                        
+                        <dt class="col-6">Added:</dt>
+                        <dd class="col-6">
+                            <time datetime="{{ book.created_at|date:'c' }}">
+                                {{ book.created_at|date:"M j, Y" }}
+                            </time>
+                        </dd>
+                        
+                        <dt class="col-6">Views:</dt>
+                        <dd class="col-6">
+                            <i class="bi bi-eye text-muted"></i>
+                            {{ book.view_count|default:0 }}
+                        </dd>
+                        
+                        <dt class="col-6">Category:</dt>
+                        <dd class="col-6">
+                            <a href="{% url 'books:book_list' %}?genre={{ book.genre }}" 
+                               class="text-decoration-none">
+                                {{ book.genre|default:"Uncategorized" }}
+                            </a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Share Widget -->
+        <section class="share-widget mb-4" aria-labelledby="share-heading">
+            <div class="card">
+                <div class="card-header">
+                    <h2 id="share-heading" class="h6 mb-0">
+                        <i class="bi bi-share text-primary"></i>
+                        Share This Book
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" 
+                           class="btn btn-outline-primary btn-sm share-btn"
+                           data-platform="facebook"
+                           title="Share on Facebook">
+                            <i class="bi bi-facebook me-2"></i>Facebook
+                        </a>
+                        <a href="#" 
+                           class="btn btn-outline-info btn-sm share-btn"
+                           data-platform="twitter"
+                           title="Share on Twitter">
+                            <i class="bi bi-twitter me-2"></i>Twitter
+                        </a>
+                        <a href="#" 
+                           class="btn btn-outline-success btn-sm share-btn"
+                           data-platform="whatsapp"
+                           title="Share on WhatsApp">
+                            <i class="bi bi-whatsapp me-2"></i>WhatsApp
+                        </a>
+                        <button type="button" 
+                                class="btn btn-outline-secondary btn-sm"
+                                onclick="navigator.share ? navigator.share({title: '{{ book.title }}', url: window.location.href}) : copyToClipboard()"
+                                title="Copy link">
+                            <i class="bi bi-link-45deg me-2"></i>Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </aside>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add to cart functionality
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', function() {
+            const bookId = this.dataset.bookId;
+            this.disabled = true;
+            this.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Adding...';
+            
+            fetch('/api/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                },
+                body: JSON.stringify({
+                    'book_id': bookId,
+                    'quantity': 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.innerHTML = '<i class="bi bi-check-lg me-2"></i>Added to Cart';
+                    this.classList.replace('btn-primary', 'btn-success');
+                    
+                    // Update cart count
+                    const cartCount = document.getElementById('cart-count');
+                    if (cartCount && data.cart && data.cart.total_items) {
+                        cartCount.textContent = data.cart.total_items;
+                    }
+                } else {
+                    throw new Error(data.message || 'Failed to add to cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.innerHTML = '<i class="bi bi-cart-plus me-2"></i>Add to Cart';
+                this.disabled = false;
+                alert('Failed to add to cart. Please try again.');
+            });
+        });
+    }
+    
+    // Wishlist functionality
+    const wishlistBtn = document.querySelector('.wishlist-btn');
+    if (wishlistBtn) {
+        wishlistBtn.addEventListener('click', function() {
+            const bookId = this.dataset.bookId;
+            const isAdded = this.classList.contains('added');
+            
+            this.disabled = true;
+            
+            fetch('/api/wishlist/toggle/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                },
+                body: JSON.stringify({'book_id': bookId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.added) {
+                        this.innerHTML = '<i class="bi bi-heart-fill me-2"></i>In Wishlist';
+                        this.classList.add('added');
+                        this.classList.replace('btn-outline-secondary', 'btn-secondary');
+                    } else {
+                        this.innerHTML = '<i class="bi bi-heart me-2"></i>Add to Wishlist';
+                        this.classList.remove('added');
+                        this.classList.replace('btn-secondary', 'btn-outline-secondary');
+                    }
+                }
+                this.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.disabled = false;
+            });
+        });
+    }
+    
+    // Share functionality
+    const shareButtons = document.querySelectorAll('.share-btn');
+    shareButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const platform = this.dataset.platform;
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('{{ book.title|escapejs }}');
+            
+            let shareUrl = '';
+            switch(platform) {
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${title}`;
+                    break;
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${title} ${url}`;
+                    break;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, 'share', 'width=600,height=400');
+            }
+        });
+    });
+    
+    // Review like functionality
+    const likeButtons = document.querySelectorAll('.like-review-btn');
+    likeButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const reviewId = this.dataset.reviewId;
+            const likesCount = this.querySelector('.likes-count');
+            
+            fetch('/api/reviews/like/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                },
+                body: JSON.stringify({'review_id': reviewId})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    likesCount.textContent = `(${data.likes_count})`;
+                    if (data.liked) {
+                        this.classList.replace('btn-outline-primary', 'btn-primary');
+                    } else {
+                        this.classList.replace('btn-primary', 'btn-outline-primary');
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+});
+
+// Copy to clipboard function
+function copyToClipboard() {
+    navigator.clipboard.writeText(window.location.href).then(function() {
+        alert('Link copied to clipboard!');
+    }).catch(function() {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = window.location.href;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Link copied to clipboard!');
+    });
+}
+</script>
+{% endblock %}
